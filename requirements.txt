@@ -1,0 +1,5 @@
+irobot_edu_sdk
+openai-whisper
+sounddevice
+numpy
+ollama
