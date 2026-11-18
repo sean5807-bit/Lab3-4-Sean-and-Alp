@@ -90,20 +90,20 @@ def parseActions(reply):
     steps = reply.split("|")
     rlist = []
     for step in steps:
-        #steps is a string
+        #step is a string
         words = step.split()
-        for i in len(words):
+        for i in range(len(words)):
             word = words[i].strip(".,!?")
-            if word.upper() == " FORWARD" or word.upper() == "BACKWARD":
-                dist = extractDistance(steps)
+            if word.upper() == "FORWARD" or word.upper() == "BACKWARD":
+                dist = extractDistance(step)
                 rlist.append((word.upper(), dist))
                 break
             if word.upper() == "LEFT" or word.upper() == "RIGHT":
-                angle = extractAngle(steps)
-                rlist.append(word.upper(), angle)
+                angle = extractAngle(step)
+                rlist.append((word.upper(), angle))
                 break
             if word.upper() == "STOP":
-                rlist.append(word.upper(), None)
+                rlist.append((word.upper(), None))
                 break
     return rlist
 
