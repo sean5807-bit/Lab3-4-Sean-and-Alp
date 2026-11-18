@@ -149,21 +149,21 @@ def validateAction(action, value, maxDistance, maxAngle):
 def buildPrompt(history, heardText):
     global MAX_HISTORY_MESSAGES
     messages = []
-    messages[0] = {"role": "system", "content": SYSTEM_PROMPT}
+    messages.append({"role": "system", "content": SYSTEM_PROMPT})
     count = 0
     for hist in history[::-1]:
         if count <= MAX_HISTORY_MESSAGES:
-            messages[hist] = history[hist]
+            messages.append(hist)
             count +=1
         else:
             break
-    
+    messages.append({"role": "user", "content": heardText})
 
     print(messages[0]["role"])
     return messages
-    # TODO: implement this function.
+
+#TODO: implement this function.
     # Hint: Look at the Handout section that has this helper function. Examples are written there.
-    raise NotImplementedError
 
 
 def describeBump(bumpLeft, bumpRight):
