@@ -85,8 +85,8 @@ def extractAngle(text):
     return None
 
 def parseActions(reply):
-    reply.replace(";", "|")
-    reply.replace("\n", "|")
+    reply = reply.replace(";", "|")
+    reply = reply.replace("\n", "|")
     steps = reply.split("|")
     rlist = []
     for step in steps:
@@ -95,21 +95,18 @@ def parseActions(reply):
         for i in range(len(words)):
             word = words[i].strip(".,!?")
             if word.upper() == "FORWARD" or word.upper() == "BACKWARD":
-                dist = extractDistance(step)
+                dist = extractDistance(step.strip())
                 rlist.append((word.upper(), dist))
                 break
             if word.upper() == "LEFT" or word.upper() == "RIGHT":
-                angle = extractAngle(step)
+                angle = extractAngle(step.strip())
                 rlist.append((word.upper(), angle))
                 break
             if word.upper() == "STOP":
                 rlist.append((word.upper(), None))
                 break
     return rlist
-
-        
-        
-    # TODO: implement this function.
+# TODO: implement this function.
     # Hint: reply.replace(";", "|") turns every ; into |. Do the same for the newline "\n".
     # Hint: reply.split("|") then gives you the steps. Loop through them.
     # Hint: step.split() gives the words of a step. word.strip(".,!?") removes punctuation
@@ -142,7 +139,7 @@ def validateAction(action, value, maxDistance, maxAngle):
         else:
             return (action, maxDistance)
         
-    # TODO: implement this function.
+# TODO: implement this function.
     # Hint: handle unknown actions and STOP first, then fill in defaults, then clamp.
 
 
