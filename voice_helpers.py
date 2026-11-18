@@ -84,15 +84,31 @@ def extractAngle(text):
             return nums[word]
     return None
 
-
 def parseActions(reply):
     reply.replace(";", "|")
     reply.replace("\n", "|")
     steps = reply.split("|")
+    rlist = []
     for step in steps:
-        alist = step.split()
-        for word in alist:
-            word = word.strip(".,!?")
+        #steps is a string
+        words = step.split()
+        for i in len(words):
+            word = words[i].strip(".,!?")
+            if word.upper() == " FORWARD" or word.upper() == "BACKWARD":
+                dist = extractDistance(steps)
+                rlist.append((word.upper(), dist))
+                break
+            if word.upper() == "LEFT" or word.upper() == "RIGHT":
+                angle = extractAngle(steps)
+                rlist.append(word.upper(), angle)
+                break
+            if word.upper() == "STOP":
+                rlist.append(word.upper(), None)
+                break
+    return rlist
+
+
+
         
         
     # TODO: implement this function.
