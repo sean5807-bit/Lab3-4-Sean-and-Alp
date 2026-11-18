@@ -72,10 +72,7 @@ def extractDistance(text):
             return round(num * convdict[unit],2)
         return round(num,2)
     return None
-# TODO: implement this function.
-    # Hint: text.lower().split() breaks the text into a list of words. Loop through them.
-    # Hint: a word is a number if it is in your number-word dictionary
-    # Hint: the word right after the number is the unit. Look it up in a dictionary of factors.
+
 
 def extractAngle(text):
     for word in text.lower().split():
@@ -86,9 +83,6 @@ def extractAngle(text):
         elif word in nums:
             return nums[word]
     return None
-# TODO: implement this function.
-    # Hint: check for the word "around" first, then look for a number.
-    # Hint: you can reuse the number-finding idea from extractDistance.
 
 def parseActions(reply):
     reply.replace(";", "|")
@@ -112,11 +106,15 @@ def parseActions(reply):
                 rlist.append((word.upper(), None))
                 break
     return rlist
-# TODO: implement this function.
+
+        
+        
+    # TODO: implement this function.
     # Hint: reply.replace(";", "|") turns every ; into |. Do the same for the newline "\n".
     # Hint: reply.split("|") then gives you the steps. Loop through them.
     # Hint: step.split() gives the words of a step. word.strip(".,!?") removes punctuation
     #       from the ends of a word. Compare word.upper() to each action name.
+
 
 def validateAction(action, value, maxDistance, maxAngle):
 
@@ -132,6 +130,15 @@ def buildPrompt(history, heardText):
 
 
 def describeBump(bumpLeft, bumpRight):
-    # TODO: implement this function.
+    if bumpLeft and bumpRight:
+        return "The robot bumped into something in front of it."
+    if not bumpLeft and not bumpRight:
+        return ""
+    if bumpLeft:
+        return "The robot bumped into something on its left."
+    if bumpRight:
+        return "The robot bumped into something on its right."
+
+print(describeBump(True, True))
+# TODO: implement this function.
     # Hint: check the "both" case before the single-side cases.
-    raise NotImplementedError
