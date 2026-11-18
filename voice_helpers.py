@@ -121,11 +121,13 @@ def validateAction(action, value, maxDistance, maxAngle):
     global DEFAULT_DISTANCE_CM
     if action == "STOP":
         return ("STOP", None)
-    if action not in "FORWARD BACKWARD LEFT RIGHT" or value <= 0:
+    if action not in "FORWARD BACKWARD LEFT RIGHT":
         return None
     if action in "FORWARD BACKWARD":
         if value == None:
             return (action, DEFAULT_DISTANCE_CM)
+        if value <= 0:
+            return None
         if value < maxDistance:
             return (action, value)
         else:
@@ -133,12 +135,13 @@ def validateAction(action, value, maxDistance, maxAngle):
     if action in "LEFT RIGHT":
         if value == None:
             return (action, DEFAULT_ANGLE_DEG)
+        if value <= 0:
+            return None
         if value < maxAngle:
             return (action, value)
         else:
             return (action, maxDistance)
         
-
     # TODO: implement this function.
     # Hint: handle unknown actions and STOP first, then fill in defaults, then clamp.
 
