@@ -117,10 +117,30 @@ def parseActions(reply):
 
 
 def validateAction(action, value, maxDistance, maxAngle):
+    global DEFAULT_ANGLE_DEG
+    global DEFAULT_DISTANCE_CM
+    if action == "STOP":
+        return ("STOP", None)
+    if action not in "FORWARD BACKWARD LEFT RIGHT" or value <= 0:
+        return None
+    if action in "FORWARD BACKWARD":
+        if value == None:
+            return (action, DEFAULT_DISTANCE_CM)
+        if value < maxDistance:
+            return (action, value)
+        else:
+            return (action, maxDistance)
+    if action in "LEFT RIGHT":
+        if value == None:
+            return (action, DEFAULT_ANGLE_DEG)
+        if value < maxAngle:
+            return (action, value)
+        else:
+            return (action, maxDistance)
+        
 
     # TODO: implement this function.
     # Hint: handle unknown actions and STOP first, then fill in defaults, then clamp.
-    raise NotImplementedError
 
 
 def buildPrompt(history, heardText):
@@ -139,6 +159,5 @@ def describeBump(bumpLeft, bumpRight):
     if bumpRight:
         return "The robot bumped into something on its right."
 
-print(describeBump(True, True))
 # TODO: implement this function.
     # Hint: check the "both" case before the single-side cases.
