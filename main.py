@@ -32,12 +32,13 @@ from voice_helpers import (
 # ---------------------------------------------------------------------------
 # Settings (YOU edit these)
 # ---------------------------------------------------------------------------
-ROBOT_NAME = "ANDRE-BOT"   # change to the name of YOUR robot
+ROBOT_NAME = "YUCHAN-BOT"   # change to the name of YOUR robot
 
 # TODO: choose these yourself and justify them in your design report.
-MAX_DISTANCE_CM = None          # largest single FORWARD/BACKWARD move allowed
-MAX_ANGLE_DEG = None            # largest single LEFT/RIGHT turn allowed
-MAX_ACTIONS_PER_COMMAND = None  # most actions one spoken command may run
+MAX_DISTANCE_CM = 150          # largest single FORWARD/BACKWARD move allowed
+MAX_ANGLE_DEG = 180            # largest single LEFT/RIGHT turn allowed
+MAX_ACTIONS_PER_COMMAND = 6  # most actions one spoken command may run
+
 
 # ---------------------------------------------------------------------------
 # Shared state (YOU may add more variables here)
@@ -108,30 +109,74 @@ async def askModel(messages):
 ################################################################################
 ################################################################################
 
+# Implementation for fail safe in robot!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! (below is the code)
+""" 
+this calls handle emergency when the one of the buttons has been presssed
+"""
+#part of handleEmergency
+@event(robot.when_touched, [True, True])  # User buttons: [(.), (..)]
+async def when_either_button_touched(robot):
+    print("Button Has Been Pressed")
+    await handleEmergency(robot)
+
+"""
+this calls the fucntion handle emergy if the left bumper has beeen pressed
+"""
+#part of handleEmergency
+@event(robot.when_bumped, [True, False])  # [left, right]
+async def when_either_bumped(robot):
+    global last_bump
+    print("The LEFT buttom has been pressed")
+    last_bump = (True, False)
+    await handleEmergency(robot)
+
+"""
+this calls the fucntion handle emergency when the right bumper has been pressed
+"""
+#part of handleEmergency
+@event(robot.when_bumped, [False, True]) #when right bumper has been pressed
+async def when_either_bumped(robot):
+    global last_bump
+    print("The RIGHT bumper has been pressed")
+    last_bump = (False, True)
+    await handleEmergency(robot)
+"""
+this calls the function handle emergency when both of the bumpers have been pressed 
+"""
+#part of handleEmergency
+@event(robot.when_bumped, [True, True]) #when both bumpers have been pressed
+async def when_either_bumped(robot):
+    global last_bump
+    print("Both bumpers have been pressed")
+    last_bump = (True, True)
+    await handleEmergency(robot)
+
 
 # ---------------------------------------------------------------------------
 # TODO: Async Function 1 - handleEmergency
 # ---------------------------------------------------------------------------
 async def handleEmergency(robot):
+    global emergency_stopped
     """
     Fail-safe that stops the robot immediately when something goes wrong.
 
     - Stop the wheels and set a solid red light.
     - Record that an emergency happened (the global emergency_stopped).
     - For bumper events, also save which bumpers were pressed in last_bump.
+    """ 
 
-    TODO: after writing this, register it as an event handler for BOTH the
-    bumpers and the buttons (see the iRobot SDK documentation for the exact
-    event names and arguments).
-    """
-    # TODO: implement this function.
-    raise NotImplementedError
-
-
+    await robot.set_wheel_speeds(0,0)
+    await robot.set_lights_on_rgb(255, 0, 0)
+    emergency_stopped = True
+    #last_bump is being set in the functions just above when the bumbers are pressed
+    #check the code above because that is also apart of step 2
 # ---------------------------------------------------------------------------
 # TODO: Async Function 2 - executeAction
 # ---------------------------------------------------------------------------
 async def executeAction(robot, action, value):
+    global MAX_DISTANCE_CM #150 cm
+    global MAX_ANGLE_DEG #180 degrees
+
     """
     Performs ONE already-validated action.
 
@@ -143,8 +188,36 @@ async def executeAction(robot, action, value):
 
     If an emergency has been recorded, do nothing.
     """
-    # TODO: implement this function.
-    raise NotImplementedError
+    if emergency_stopped:
+            return
+
+    
+    if action == "STOP": # this going to stop the robot
+        await robot.set_wheel_speeds(0,0)
+        await robot.set_lights_on_rgb(0, 255, 0)
+
+    if action == "FORWARD":
+        if value < MAX_DISTANCE_CM:
+            await robot.move(value)
+        else:
+            await robot.move(MAX_DISTANCE_CM)
+    elif action == "BACKWARD":
+        if value < MAX_DISTANCE_CM:
+            newValue = -1 * value
+            await robot.move(newValue)
+        else:
+            newValue = -1 * MAX_DISTANCE_CM
+            await robot.move(newValue)
+    elif action == "LEFT":
+        if value < MAX_ANGLE_DEG:
+            await robot.turn_left(value)
+        else:
+            await robot.turn_left(MAX_ANGLE_DEG)
+    elif action == "RIGHT": 
+        if value < MAX_ANGLE_DEG:
+            await robot.turn_right(value)
+        else:
+            await robot.turn_right(MAX_ANGLE_DEG)
 
 
 # ---------------------------------------------------------------------------

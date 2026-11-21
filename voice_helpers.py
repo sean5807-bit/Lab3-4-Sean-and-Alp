@@ -36,7 +36,40 @@ MAX_HISTORY_MESSAGES = 6
 ################################################################################
 
 # Prompt Design: replace this with your own system prompt.
-SYSTEM_PROMPT = "TODO: write your system prompt (see Prompt Design in the handout)."
+# this promt here is basically instructions for the AI
+SYSTEM_PROMPT = """You turn spoken commands into instructions for a small floor Irobot create 3.
+
+                    Reply with ONLY the commands and no other words, explanations, or punctuation or any other 
+                    thing that is irrelevant.
+
+                    Write each command as an action word(one of the five), a number, and a unit, with spaces between them.
+                    Only use these action words: FORWARD, BACKWARD, LEFT, RIGHT, STOP.
+                    Use the same number and unit the person said. Don't convert them to anything else.
+                    If they give you more than one command, put " | " between each one.
+
+                    Rules you need to follow to give the right repsonse:
+                    If the user says turn left or turn right without an angle, use 90 degrees.
+                    If the request is unclear or not safe, reply with STOP.
+                    If the user says "do that again", repeat your last reply exactly.
+                    If the user says "a bit more", repeat the last action with
+                    10 cm (for FORWARD or BACKWARD) or 15 degrees (for LEFT or RIGHT).
+
+                    Good examples for you to follow and what the user says and how you should respond:
+                    User: go forward 40 centimeters
+                    You: FORWARD 40 cm
+                    User: go forward two feet then turn left
+                    You: FORWARD 2 feet | LEFT 90 degrees
+                    User: do that again
+                    You: FORWARD 2 feet | LEFT 90 degrees
+                    User: a bit more
+                    You: FORWARD 0.5 feet | LEFT 15 degrees
+                    User: back up 6 inches and turn right 45 degrees
+                    You: BACKWARD 6 inches | RIGHT 45 degrees
+                    User: what's the weather in Atlanta
+                    You: STOP
+
+                    Make sure your response follows all of the rules and format
+                    """
 
 # TODO: add any constants or lookup tables you need below (for example,
 # number words and unit conversions).
@@ -56,6 +89,7 @@ nums = {"one":1, 'two':2, "three":3, 'four':4, "five":5, "six":6, "seven":7, 'ei
 ################################################################################
 
 
+# Retrns distance in CM or None
 def extractDistance(text):
     unit = ''
     num = 0
@@ -74,6 +108,7 @@ def extractDistance(text):
     return None
 
 
+# returns angle(float) or None 
 def extractAngle(text):
     for word in text.lower().split():
         if word == "around":
@@ -84,6 +119,7 @@ def extractAngle(text):
             return nums[word]
     return None
 
+#returns a list of tuples of actions 
 def parseActions(reply):
     reply = reply.replace(";", "|")
     reply = reply.replace("\n", "|")
@@ -113,6 +149,22 @@ def parseActions(reply):
     #       from the ends of a word. Compare word.upper() to each action name.
 
 
+"""
+returns (action, value) or none 
+
+-If action is not one of the five actions it will retunr none 
+-STOP returns (stop, none)
+
+- if value is none it uses the default distance for forward/backward
+    it uses default angle for turning left of right 
+
+- if value is 0 or negative it returns none 
+
+- if the value is greater than 0 it will return the max value 
+
+DEFAULT_DISTANCE_CM = 15.0
+DEFAULT_ANGLE_DEG = 90.0
+"""
 def validateAction(action, value, maxDistance, maxAngle):
     global DEFAULT_ANGLE_DEG
     global DEFAULT_DISTANCE_CM
@@ -142,6 +194,12 @@ def validateAction(action, value, maxDistance, maxAngle):
 # TODO: implement this function.
     # Hint: handle unknown actions and STOP first, then fill in defaults, then clamp.
 
+"""
+paramters: history(a list of dictionaries), heardtext(string )
+
+-this is going to give the memory of the recent conversations 
+
+"""
 
 def buildPrompt(history, heardText):
     global MAX_HISTORY_MESSAGES
@@ -162,7 +220,10 @@ def buildPrompt(history, heardText):
 #TODO: implement this function.
     # Hint: Look at the Handout section that has this helper function. Examples are written there.
 
-
+"""
+-this will retrun a string saying which bumper has been pressed 
+- if both have been pressed it will say that it bumped into something in  front of it
+"""
 def describeBump(bumpLeft, bumpRight):
     if bumpLeft and bumpRight:
         return "The robot bumped into something in front of it."
