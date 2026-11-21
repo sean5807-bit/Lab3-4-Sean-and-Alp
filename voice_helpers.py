@@ -56,6 +56,7 @@ SYSTEM_PROMPT = """You turn spoken commands into instructions for a small floor 
                     If the user says "do that again", repeat your last reply exactly.
                     If the user says "a bit more", repeat the last action with
                     10 cm (for FORWARD or BACKWARD) or 15 degrees (for LEFT or RIGHT).
+                    if the user says "turn around" that means "turn RIGHT 180 degrees"
 
                     Good examples for you to follow and what the user says and how you should respond:
                     User: go forward 40 centimeters
@@ -74,6 +75,9 @@ SYSTEM_PROMPT = """You turn spoken commands into instructions for a small floor 
                     You: RIGHT 90 degrees
                     User: turn left 30 degrees
                     You: LEFT 30 degrees
+                    User: Turn around
+                    You: RIGHT 180 degrees
+
 
                     Make sure your response follows all of the rules and format
                     """
@@ -196,7 +200,7 @@ def validateAction(action, value, maxDistance, maxAngle):
         if value < maxAngle:
             return (action, value)
         else:
-            return (action, maxDistance)
+            return (action, maxAngle)
         
 # TODO: implement this function.
     # Hint: handle unknown actions and STOP first, then fill in defaults, then clamp.

@@ -35,7 +35,7 @@ from voice_helpers import (
 ROBOT_NAME = "YUCHAN-BOT"   # change to the name of YOUR robot
 
 # TODO: choose these yourself and justify them in your design report.
-MAX_DISTANCE_CM = 150          # largest single FORWARD/BACKWARD move allowed
+MAX_DISTANCE_CM = 250          # largest single FORWARD/BACKWARD move allowed
 MAX_ANGLE_DEG = 180            # largest single LEFT/RIGHT turn allowed
 MAX_ACTIONS_PER_COMMAND = 6  # most actions one spoken command may run
 
