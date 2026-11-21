@@ -213,12 +213,8 @@ def buildPrompt(history, heardText):
     messages = []
     messages.append({"role": "system", "content": SYSTEM_PROMPT})
     count = 0
-    for hist in history[::-1]:
-        if count <= MAX_HISTORY_MESSAGES:
-            messages.append(hist)
-            count +=1
-        else:
-            break
+    for hist in history[-MAX_HISTORY_MESSAGES:]: #keeps messages in orginal order
+        messages.append(hist)
     messages.append({"role": "user", "content": heardText})
 
     print(messages[0]["role"])

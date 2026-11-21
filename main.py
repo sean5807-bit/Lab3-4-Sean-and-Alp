@@ -187,17 +187,13 @@ async def executeAction(robot, action, value):
         await robot.set_lights_on_rgb(0, 255, 0)
 
     if action == "FORWARD":
-        if value < MAX_DISTANCE_CM:
-            await robot.move(value)
-        else:
-            await robot.move(MAX_DISTANCE_CM)
+        await robot.set_wheel_speeds(10, 10)
+        await robot.wait(min(value, MAX_DISTANCE_CM) / 10)  #calculate time to reach right distance 
+        await robot.set_wheel_speeds(0, 0)
     elif action == "BACKWARD":
-        if value < MAX_DISTANCE_CM:
-            newValue = -1 * value
-            await robot.move(newValue)
-        else:
-            newValue = -1 * MAX_DISTANCE_CM
-            await robot.move(newValue)
+        await robot.set_wheel_speeds(-10, -10) #moves backwards
+        await robot.wait(min(value, MAX_DISTANCE_CM) / 10) #calculate time to reach right distance 
+        await robot.set_wheel_speeds(0, 0)
     elif action == "LEFT":
         if value < MAX_ANGLE_DEG:
             await robot.turn_left(value)
