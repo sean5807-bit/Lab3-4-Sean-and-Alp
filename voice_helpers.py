@@ -85,8 +85,8 @@ SYSTEM_PROMPT = """You turn spoken commands into instructions for a small floor 
 # TODO: add any constants or lookup tables you need below (for example,
 # number words and unit conversions).
 convdict = {"cm":1, "m":100, "f":30.48, "i":2.54}
-units = {"centimeters": "cm", "centimeter": "cm", "cm":"cm", 'meters' :' m' ,
-         'meter':'m', 'm':'m', 'feet':'f', 'foot':'f', 'inches':'i','inch':'i', 'in':'i'}
+units = {"centimeters": "cm", "centimeter": "cm", "cm":"cm", 'meters' :'m' ,
+         'meter':'m', 'm':'m', 'feet':'f', 'foot':'f', 'ft':'f', 'inches':'i','inch':'i', 'in':'i'}
 nums = {"one":1, 'two':2, "three":3, 'four':4, "five":5, "six":6, "seven":7, 'eight':8, 'nine':9, 'ten':10, 'ninety':90.0}
 
 ################################################################################
@@ -105,7 +105,8 @@ def extractDistance(text):
     unit = ''
     num = 0
     for word in text.lower().split():
-        if word.isdigit():
+        word = word.strip(".,!?") #removes unwanted puctuation
+        if word.replace(".", "", 1).isdigit():
             num = float(word)
         elif word in nums:
             num = nums[word]
