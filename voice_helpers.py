@@ -47,6 +47,9 @@ SYSTEM_PROMPT = """You turn spoken commands into instructions for a small floor 
                     Use the same number and unit the person said. Don't convert them to anything else.
                     If they give you more than one command, put " | " between each one.
 
+                    Only include the actions the person asked for in their newest message. 
+                    Never add extra actions, and never repeat earlier commands unless they say "do that again".
+
                     Rules you need to follow to give the right repsonse:
                     If the user says turn left or turn right without an angle, use 90 degrees.
                     If the request is unclear or not safe, reply with STOP.
@@ -67,6 +70,10 @@ SYSTEM_PROMPT = """You turn spoken commands into instructions for a small floor 
                     You: BACKWARD 6 inches | RIGHT 45 degrees
                     User: what's the weather in Atlanta
                     You: STOP
+                    User: turn right
+                    You: RIGHT 90 degrees
+                    User: turn left 30 degrees
+                    You: LEFT 30 degrees
 
                     Make sure your response follows all of the rules and format
                     """

@@ -127,7 +127,7 @@ this calls the fucntion handle emergy if the left bumper has beeen pressed
 async def when_either_bumped(robot):
     global last_bump
     print("The LEFT buttom has been pressed")
-    last_bump = (True, False)
+    last_bump = (True, last_bump[1])
     await handleEmergency(robot)
 
 """
@@ -138,17 +138,7 @@ this calls the fucntion handle emergency when the right bumper has been pressed
 async def when_either_bumped(robot):
     global last_bump
     print("The RIGHT bumper has been pressed")
-    last_bump = (False, True)
-    await handleEmergency(robot)
-"""
-this calls the function handle emergency when both of the bumpers have been pressed 
-"""
-#part of handleEmergency
-@event(robot.when_bumped, [True, True]) #when both bumpers have been pressed
-async def when_either_bumped(robot):
-    global last_bump
-    print("Both bumpers have been pressed")
-    last_bump = (True, True)
+    last_bump = (last_bump[0], True)
     await handleEmergency(robot)
 
 
@@ -250,11 +240,66 @@ async def voiceControl(robot):
     Remember: to change a global variable inside a function you need the
     `global` keyword.
     """
-    print("Voice control is active. Press Ctrl+C to stop.")
+
     # TODO: implement this function.
+    global emergency_stopped
+    global last_bump
+
+    print("Voice control is active. Press Ctrl+C to stop.")
     while True:
         try:
-            pass  ####Your Code here!###
+            #this gets what the person said
+            heardText = await getSpokenCommand()
+            if heardText == "":
+                print("Didn't hear anything, please try again")
+                continue
+            print("Heard:", heardText)
+
+            #if the robot bumped into something 
+            bumped = False
+            if emergency_stopped:
+                note = describeBump(last_bump[0], last_bump[1]) #this deribes the bump
+                if note != "":
+                    heardText = note + " " + heardText
+                    bumped = True
+                emergency_stopped = False
+                last_bump = (False, False)
+
+            #this makes the message to send to AI
+            message = buildPrompt(history, heardText)
+            reply = await askModel(message)
+
+            #this changes the history of the last commands
+            history.append({"role": "user", "content": heardText})
+            history.append({"role": "assistant", "content": reply})
+
+            #turns the reply into actions
+            actions = []
+            for action,value in parseActions(reply):
+                checked = validateAction(action, value, MAX_DISTANCE_CM, MAX_ANGLE_DEG)
+                if checked != None:
+                    if bumped and checked[0] == "BACKWARD" and checked[1] > 25:
+                        checked = ("BACKWARD", 25.0)
+                    actions.append(checked)
+
+            #this only keeps a certain amount of actions in the history using the max actions variables
+            actions = actions[:MAX_ACTIONS_PER_COMMAND] #slicing to to max value of how many you want
+
+            #if there are no actions
+            if len(actions) == 0:
+                print("There are no actions, please try again")
+                continue
+
+            #do each action but need to stop if there is an emergency
+            for action, value in actions:
+                if emergency_stopped:
+                    print("There Has Been An Emergency!!!")
+                    break
+                print("Executing", action, value)
+                await executeAction(robot, action, value)  #this will fix the robot after the emergency
+
+
+
         except Exception:
             traceback.print_exc()
             print("[MAIN] Something went wrong (see error above). Listening again...")

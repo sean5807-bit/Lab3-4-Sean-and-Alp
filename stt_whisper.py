@@ -28,8 +28,8 @@ import sounddevice as sd
 import whisper
 
 SAMPLE_RATE = 16000       # Whisper expects 16kHz mono audio
-RECORD_SECONDS = 4        # how long we listen each time we ask for a command
-
+RECORD_SECONDS = 6        # how long we listen each time we ask for a command
+#changed this because there wasn't enough time to talk
 # This downloads the model once (to ~/.cache/whisper) and then reuses it.
 print("[STT] Loading Whisper model (only happens once per run)...")
 _model = whisper.load_model("base")
